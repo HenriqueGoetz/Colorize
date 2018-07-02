@@ -30,8 +30,8 @@ public class MainFrame extends javax.swing.JFrame {
         initComponents();
     }
     
-    BufferedImage imagemcolorida;
-    BufferedImage imagemgreyscale;
+    BufferedImage imagemcolorida = null;
+    BufferedImage imagemgreyscale = null;
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -470,14 +470,28 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private BufferedImage toGreyScale(BufferedImage image){
+    private BufferedImage newCopy(BufferedImage image) {
 
-        int width = image.getWidth();
-        int height = image.getHeight();
+        BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+        for (int x = 0; x < image.getWidth(); x++) {
+            for (int y = 0; y < image.getHeight(); y++) {
+                newImage.setRGB(x, y, image.getRGB(x, y));
+            }
+        }
+        return newImage;
+    }
+    
+    private BufferedImage toGreyScale(BufferedImage image){
+        
+        BufferedImage newImage = newCopy(image);
+
+        int width = newImage.getWidth();
+        int height = newImage.getHeight();
 
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
-                int rgb = image.getRGB(col, row);
+                int rgb = newImage.getRGB(col, row);
                 
                 Color c = new Color(rgb);
                 int red = c.getRed();
@@ -486,14 +500,20 @@ public class MainFrame extends javax.swing.JFrame {
                 int k = (int) ((red * 0.299) + (0.587 * green) + (0.114 * blue));
                 
                 Color greyscale = new Color(k, k, k);
-                image.setRGB(col, row, greyscale.getRGB());
+                newImage.setRGB(col, row, greyscale.getRGB());
             }
         }
-        return image;
+        return newImage;
     }
     
     private void btnColorizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnColorizeActionPerformed
-
+        
+        if(imagemcolorida == null || imagemgreyscale == null){
+            System.out.println("\nImagem não carregada.\n");
+        }else{
+        
+        
+        }
         
     }//GEN-LAST:event_btnColorizeActionPerformed
 
