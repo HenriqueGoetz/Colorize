@@ -5,8 +5,17 @@
  */
 package janelaPrincipal;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.SwingConstants;
 
 /**
  *
@@ -20,6 +29,9 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
     }
+    
+    BufferedImage imagemcolorida;
+    BufferedImage imagemgreyscale;
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -31,7 +43,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         lblImagemColorida = new javax.swing.JLabel();
-        lblImagemGrayScale = new javax.swing.JLabel();
+        lblImagemGreyScale = new javax.swing.JLabel();
         pnlSwatch = new javax.swing.JPanel();
         btnColorize = new javax.swing.JButton();
         pnlColoridaSwatch = new javax.swing.JPanel();
@@ -72,12 +84,16 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel16 = new javax.swing.JLabel();
         txtGrayscaleYPrimeiroSW2 = new javax.swing.JTextField();
         txtGrayscaleYSegundoSW2 = new javax.swing.JTextField();
+        btnCarregarColorida = new javax.swing.JButton();
+        btnCarregarGreyScale = new javax.swing.JButton();
+        txtNome = new javax.swing.JTextField();
+        btnSalvar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         lblImagemColorida.setText("Imagem com as cores fonte ainda não selecionada.");
 
-        lblImagemGrayScale.setText("Imagem a ser colorida ainda não selecionada.");
+        lblImagemGreyScale.setText("Imagem a ser colorida ainda não selecionada.");
 
         pnlSwatch.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
@@ -384,28 +400,67 @@ public class MainFrame extends javax.swing.JFrame {
 
         pnlGreyscaleSwatch.getAccessibleContext().setAccessibleName("Na imagem greyscale");
 
+        btnCarregarColorida.setText("Carregar Imagem Colorida");
+        btnCarregarColorida.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCarregarColoridaActionPerformed(evt);
+            }
+        });
+
+        btnCarregarGreyScale.setText("Carregar Imagem Greyscale");
+        btnCarregarGreyScale.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCarregarGreyScaleActionPerformed(evt);
+            }
+        });
+
+        txtNome.setText("NomedaImagem");
+
+        btnSalvar.setText("Salvar ");
+        btnSalvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSalvarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblImagemColorida, javax.swing.GroupLayout.PREFERRED_SIZE, 546, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblImagemGrayScale, javax.swing.GroupLayout.PREFERRED_SIZE, 546, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(pnlSwatch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(pnlSwatch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblImagemColorida, javax.swing.GroupLayout.PREFERRED_SIZE, 546, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnCarregarColorida))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(lblImagemGreyScale, javax.swing.GroupLayout.PREFERRED_SIZE, 546, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnCarregarGreyScale)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnSalvar)
+                                .addGap(5, 5, 5)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblImagemGrayScale, javax.swing.GroupLayout.PREFERRED_SIZE, 396, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnCarregarColorida)
+                    .addComponent(btnCarregarGreyScale)
+                    .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSalvar))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblImagemGreyScale, javax.swing.GroupLayout.PREFERRED_SIZE, 396, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblImagemColorida, javax.swing.GroupLayout.PREFERRED_SIZE, 396, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(pnlSwatch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -415,11 +470,83 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private BufferedImage toGreyScale(BufferedImage image){
+
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                int rgb = image.getRGB(col, row);
+                
+                Color c = new Color(rgb);
+                int red = c.getRed();
+                int green = c.getGreen();
+                int blue = c.getBlue();
+                int k = (int) ((red * 0.299) + (0.587 * green) + (0.114 * blue));
+                
+                Color greyscale = new Color(k, k, k);
+                image.setRGB(col, row, greyscale.getRGB());
+            }
+        }
+        return image;
+    }
+    
     private void btnColorizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnColorizeActionPerformed
 
         
     }//GEN-LAST:event_btnColorizeActionPerformed
 
+    private void btnCarregarColoridaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCarregarColoridaActionPerformed
+        // Carrega a imagem colorida.
+
+        JFileChooser jfc = new JFileChooser();
+
+        if (jfc.showOpenDialog(btnCarregarColorida) == JFileChooser.APPROVE_OPTION) {
+            try {
+                imagemcolorida = ImageIO.read(jfc.getSelectedFile());
+                lblImagemColorida.setText("");
+                lblImagemColorida.setIcon(new ImageIcon(imagemcolorida));
+                lblImagemColorida.setHorizontalAlignment(SwingConstants.CENTER);
+            } catch (IOException ex) {
+                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_btnCarregarColoridaActionPerformed
+
+    private void btnCarregarGreyScaleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCarregarGreyScaleActionPerformed
+        // Carrega a imagem em grayscale.
+
+        JFileChooser jfc = new JFileChooser();
+
+        if (jfc.showOpenDialog(btnCarregarColorida) == JFileChooser.APPROVE_OPTION) {
+            try {
+                imagemgreyscale = ImageIO.read(jfc.getSelectedFile());
+                lblImagemGreyScale.setText("");
+                imagemgreyscale = toGreyScale(imagemgreyscale);
+                lblImagemGreyScale.setIcon(new ImageIcon(imagemgreyscale));
+                lblImagemGreyScale.setHorizontalAlignment(SwingConstants.CENTER);
+            } catch (IOException ex) {
+                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_btnCarregarGreyScaleActionPerformed
+
+    private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
+        //Salva a imagem resultante.
+
+        if (!txtNome.getText().equals("")) {
+            try {
+                ImageIO.write(imagemgreyscale, "PNG", new File("Imagens/" + txtNome.getText() + ".png"));
+            } catch (IOException ex) {
+                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+    }//GEN-LAST:event_btnSalvarActionPerformed
+
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -456,9 +583,10 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnAplicarTranferenciaSwatch;
-    private javax.swing.JButton btnAplicarTranferenciaSwatch1;
+    private javax.swing.JButton btnCarregarColorida;
+    private javax.swing.JButton btnCarregarGreyScale;
     private javax.swing.JButton btnColorize;
+    private javax.swing.JButton btnSalvar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -475,10 +603,8 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
     private javax.swing.JLabel lblImagemColorida;
-    private javax.swing.JLabel lblImagemGrayScale;
+    private javax.swing.JLabel lblImagemGreyScale;
     private javax.swing.JPanel pnlColoridaSwatch;
     private javax.swing.JPanel pnlColoridaSwatch1;
     private javax.swing.JPanel pnlColoridaSwatch2;
@@ -502,5 +628,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTextField txtGrayscaleYPrimeiroSW2;
     private javax.swing.JTextField txtGrayscaleYSegundoSW1;
     private javax.swing.JTextField txtGrayscaleYSegundoSW2;
+    private javax.swing.JTextField txtNome;
     // End of variables declaration//GEN-END:variables
 }
