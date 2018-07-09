@@ -17,6 +17,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.SwingConstants;
 
+
 /**
  *
  * @author Henrique Goetz
@@ -512,11 +513,106 @@ public class MainFrame extends javax.swing.JFrame {
             System.out.println("\nImagem não carregada.\n");
         }else{
         
-        
+        Point swatch1Pcolorida = null;
+        Point swatch1Scolorida = null;
+        Point swatch1Pgrayscale = null;
+        Point swatch1Sgrayscale = null;
+        Point swatch2Pcolorida = null;
+        Point swatch2Scolorida = null;
+        Point swatch2Pgrayscale = null;
+        Point swatch2Sgrayscale = null;
+
+        if (executaSW1()) {
+            swatch1Pcolorida = new Point(Integer.valueOf(txtColoridaXPrimeiroSW1.getText()), Integer.valueOf(txtColoridaYPrimeiroSW1.getText()));
+            swatch1Scolorida = new Point(Integer.valueOf(txtColoridaXSegundoSW1.getText()), Integer.valueOf(txtColoridaYSegundoSW1.getText()));
+
+            swatch1Pgrayscale = new Point(Integer.valueOf(txtGrayscaleXPrimeiroSW1.getText()), Integer.valueOf(txtGrayscaleYPrimeiroSW1.getText()));
+            swatch1Sgrayscale = new Point(Integer.valueOf(txtGrayscaleXSegundoSW1.getText()), Integer.valueOf(txtGrayscaleYSegundoSW1.getText()));
+        }
+        if (executaSW2()) {
+            swatch2Pcolorida = new Point(Integer.valueOf(txtColoridaXPrimeiroSW2.getText()), Integer.valueOf(txtColoridaYPrimeiroSW2.getText()));
+            swatch2Scolorida = new Point(Integer.valueOf(txtColoridaXSegundoSW2.getText()), Integer.valueOf(txtColoridaYSegundoSW2.getText()));
+
+            swatch2Pgrayscale = new Point(Integer.valueOf(txtGrayscaleXPrimeiroSW2.getText()), Integer.valueOf(txtGrayscaleYPrimeiroSW2.getText()));
+            swatch2Sgrayscale = new Point(Integer.valueOf(txtGrayscaleXSegundoSW2.getText()), Integer.valueOf(txtGrayscaleYSegundoSW2.getText()));
+        }
+        BufferedImage imagemcoloridaemgrayscale = newCopy(imagemcolorida);
+
+        imagemcoloridaemgrayscale = toGreyScale(imagemcoloridaemgrayscale);
+
+        BufferedImage imagemresultante = new BufferedImage(imagemgreyscale.getWidth(), imagemgreyscale.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+        imagemresultante = colorizando(imagemcoloridaemgrayscale, imagemresultante);
+
+        if (executaSW1()) {
+            imagemresultante = colorizandoSwatch(imagemresultante, swatch1Pcolorida, swatch1Scolorida, swatch1Pgrayscale, swatch1Sgrayscale, imagemcoloridaemgrayscale);
+        }
+        if (executaSW2()) {
+            imagemresultante = colorizandoSwatch(imagemresultante, swatch2Pcolorida, swatch2Scolorida, swatch2Pgrayscale, swatch2Sgrayscale, imagemcoloridaemgrayscale);
+        }
+
+        imagemgreyscale = imagemresultante;
+
+        lblImagemColorida.setIcon(new ImageIcon(imagemcolorida));
+        lblImagemColorida.setHorizontalAlignment(SwingConstants.CENTER);
+        lblImagemGreyScale.setIcon(new ImageIcon(imagemgreyscale));
+        lblImagemGreyScale.setHorizontalAlignment(SwingConstants.CENTER);
         }
         
     }//GEN-LAST:event_btnColorizeActionPerformed
 
+    private boolean executaSW1() {
+        return !(txtColoridaXPrimeiroSW1.getText().trim().equals("") || txtColoridaYPrimeiroSW1.getText().trim().equals("") || txtColoridaXSegundoSW1.getText().trim().equals("") || txtColoridaYSegundoSW1.getText().trim().equals("") || txtGrayscaleXPrimeiroSW1.getText().trim().equals("") || txtGrayscaleYPrimeiroSW1.getText().trim().equals("") || txtGrayscaleXSegundoSW1.getText().trim().equals("") || txtGrayscaleYSegundoSW1.getText().trim().equals(""));
+    }
+    
+    private boolean executaSW2() {
+        return !(txtColoridaXPrimeiroSW2.getText().trim().equals("") || txtColoridaYPrimeiroSW2.getText().trim().equals("") || txtColoridaXSegundoSW2.getText().trim().equals("") || txtColoridaYSegundoSW2.getText().trim().equals("") || txtGrayscaleXPrimeiroSW2.getText().trim().equals("") || txtGrayscaleYPrimeiroSW2.getText().trim().equals("") || txtGrayscaleXSegundoSW2.getText().trim().equals("") || txtGrayscaleYSegundoSW2.getText().trim().equals(""));
+    }
+    
+    private BufferedImage colorizando(BufferedImage imagemcoloridaemgrayscale, BufferedImage imagemresultante) {
+        int foramx = 0;
+        
+       
+        for (int rows = 1; rows < imagemgreyscale.getHeight() - 1; rows++) {
+            for (int cols = 1; cols < imagemgreyscale.getWidth() - 1; cols++) {
+
+                Point posicao = encontraMaisSemelhante(cols, rows, imagemcoloridaemgrayscale);
+                int x = posicao.x;
+                int y = posicao.y;
+
+                int rgb = imagemcolorida.getRGB(x, y);
+
+                Color temp = new Color(rgb);
+                imagemresultante.setRGB(cols, rows, temp.getRGB());
+            }
+            
+            foramx++;
+
+            System.out.println(imagemgreyscale.getHeight() - foramx);
+        }
+        System.out.println("Fim");
+
+        return imagemresultante;
+    }
+    
+    
+    private BufferedImage colorizandoSwatch(BufferedImage imagemresultante, Point colorida1, Point colorida2, Point grayscale1, Point grayscale2, BufferedImage imagemcoloridaemgrayscale) {
+
+        for (int cols = grayscale1.x; cols < grayscale2.x - 1; cols++) {
+            for (int rows = grayscale1.y; rows < grayscale2.y - 1; rows++) {
+
+                Point posicao = encontraMaisSemelhante(cols, rows, imagemcoloridaemgrayscale, colorida1, colorida2);
+                int x = posicao.x;
+                int y = posicao.y;
+                int rgb = imagemcolorida.getRGB(x, y);
+                Color temp = new Color(rgb);
+                imagemresultante.setRGB(cols, rows, temp.getRGB());
+            }
+        }
+
+        return imagemresultante;
+    }
+    
     private void btnCarregarColoridaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCarregarColoridaActionPerformed
         // Carrega a imagem colorida.
 
@@ -565,7 +661,101 @@ public class MainFrame extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btnSalvarActionPerformed
 
-    
+    // Quando sem swatch.
+    private Point encontraMaisSemelhante(int cols, int rows, BufferedImage imagemcoloridaemgrayscale) {
+        int x1 = 0;
+        int x2 = 0;
+        double maissemelhante = 1000; //Apenas inicializando, no primeiro caso do for será modificado.
+
+        // Coletando pixels vizinhos.
+        int a = imagemgreyscale.getRGB(cols - 1, rows - 1);
+        int b = imagemgreyscale.getRGB(cols, rows - 1);
+        int c = imagemgreyscale.getRGB(cols + 1, rows - 1);
+        int d = imagemgreyscale.getRGB(cols - 1, rows);
+        int e = imagemgreyscale.getRGB(cols, rows);
+        int f = imagemgreyscale.getRGB(cols + 1, rows);
+        int g = imagemgreyscale.getRGB(cols - 1, rows + 1);
+        int h = imagemgreyscale.getRGB(cols, rows + 1);
+        int i = imagemgreyscale.getRGB(cols + 1, rows + 1);
+
+        // Verificando o pixel mais semelhante na imagem.
+        for (int x = 1; x < imagemcoloridaemgrayscale.getWidth() - 1; x++) {
+            for (int y = 1; y < imagemcoloridaemgrayscale.getHeight() - 1; y++) {
+                int A = imagemcoloridaemgrayscale.getRGB(x - 1, y - 1);
+                int B = imagemcoloridaemgrayscale.getRGB(x, y - 1);
+                int C = imagemcoloridaemgrayscale.getRGB(x + 1, y - 1);
+                int D = imagemcoloridaemgrayscale.getRGB(x - 1, y);
+                int E = imagemcoloridaemgrayscale.getRGB(x, y);
+                int F = imagemcoloridaemgrayscale.getRGB(x + 1, y);
+                int G = imagemcoloridaemgrayscale.getRGB(x - 1, y + 1);
+                int H = imagemcoloridaemgrayscale.getRGB(x, y + 1);
+                int I = imagemcoloridaemgrayscale.getRGB(x + 1, y + 1);
+
+                if (x == 1 && y == 1) {
+                    x1 = 1;
+                    x2 = 1;
+                    maissemelhante = (Math.abs(E - e) * 0.5) + 0.5 * (Math.abs(A - a) + Math.abs(B - b) + Math.abs(C - c) + Math.abs(D - d) + Math.abs(F - f) + Math.abs(G - g) + Math.abs(H - h) + Math.abs(I - i));
+                } else {
+                    double novo = (Math.abs(E - e) * 0.5) + 0.5 * (Math.abs(A - a) + Math.abs(B - b) + Math.abs(C - c) + Math.abs(D - d) + Math.abs(F - f) + Math.abs(G - g) + Math.abs(H - h) + Math.abs(I - i));
+                    if (maissemelhante > novo) {
+                        x1 = x;
+                        x2 = y;
+                        maissemelhante = novo;
+                    }
+                }
+            }
+        }
+  
+        return new Point(x1,x2);
+    }
+
+    // Quando usado swatch.
+    private Point encontraMaisSemelhante(int cols, int rows, BufferedImage imagemcoloridaemgrayscale, Point inicio, Point fim) {
+        int x1 = 0;
+        int x2 = 0;
+        double maissemelhante = 1000; //Apenas inicializando, no primeiro caso do for será modificado.
+
+        // Coletando pixels vizinhos.
+        int a = imagemgreyscale.getRGB(cols - 1, rows - 1);
+        int b = imagemgreyscale.getRGB(cols, rows - 1);
+        int c = imagemgreyscale.getRGB(cols + 1, rows - 1);
+        int d = imagemgreyscale.getRGB(cols - 1, rows);
+        int e = imagemgreyscale.getRGB(cols, rows);
+        int f = imagemgreyscale.getRGB(cols + 1, rows);
+        int g = imagemgreyscale.getRGB(cols - 1, rows + 1);
+        int h = imagemgreyscale.getRGB(cols, rows + 1);
+        int i = imagemgreyscale.getRGB(cols + 1, rows + 1);
+
+        // Verificando o pixel mais semelhante na imagem.
+        for (int x = inicio.x; x < fim.x - 1; x++) {
+            for (int y = inicio.y; y < fim.y - 1; y++) {
+                int A = imagemcoloridaemgrayscale.getRGB(x - 1, y - 1);
+                int B = imagemcoloridaemgrayscale.getRGB(x, y - 1);
+                int C = imagemcoloridaemgrayscale.getRGB(x + 1, y - 1);
+                int D = imagemcoloridaemgrayscale.getRGB(x - 1, y);
+                int E = imagemcoloridaemgrayscale.getRGB(x, y);
+                int F = imagemcoloridaemgrayscale.getRGB(x + 1, y);
+                int G = imagemcoloridaemgrayscale.getRGB(x - 1, y + 1);
+                int H = imagemcoloridaemgrayscale.getRGB(x, y + 1);
+                int I = imagemcoloridaemgrayscale.getRGB(x + 1, y + 1);
+
+                if (x == inicio.x && y == inicio.y) {
+                    x1 = 1;
+                    x2 = 1;
+                    maissemelhante = (Math.abs(E - e) * 0.5) + 0.5 * (Math.abs(A - a) + Math.abs(B - b) + Math.abs(C - c) + Math.abs(D - d) + Math.abs(F - f) + Math.abs(G - g) + Math.abs(H - h) + Math.abs(I - i));
+                } else {
+                    double novo = (Math.abs(E - e) * 0.5) + 0.5 * (Math.abs(A - a) + Math.abs(B - b) + Math.abs(C - c) + Math.abs(D - d) + Math.abs(F - f) + Math.abs(G - g) + Math.abs(H - h) + Math.abs(I - i));
+                    if (maissemelhante > novo) {
+                        x1 = x;
+                        x2 = y;
+                        maissemelhante = novo;
+                    }
+                }
+            }
+        }
+
+        return new Point(x1, x2);
+    }
     
     /**
      * @param args the command line arguments
