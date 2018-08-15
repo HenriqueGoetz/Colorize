@@ -17,7 +17,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.SwingConstants;
 
-
 /**
  *
  * @author Henrique Goetz
@@ -30,7 +29,7 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
     }
-    
+
     BufferedImage imagemcolorida = null;
     BufferedImage imagemgreyscale = null;
 
@@ -482,9 +481,9 @@ public class MainFrame extends javax.swing.JFrame {
         }
         return newImage;
     }
-    
-    private BufferedImage toGreyScale(BufferedImage image){
-        
+
+    private BufferedImage toGreyScale(BufferedImage image) {
+
         BufferedImage newImage = newCopy(image);
 
         int width = newImage.getWidth();
@@ -493,88 +492,81 @@ public class MainFrame extends javax.swing.JFrame {
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 int rgb = newImage.getRGB(col, row);
-                
+
                 Color c = new Color(rgb);
                 int red = c.getRed();
                 int green = c.getGreen();
                 int blue = c.getBlue();
                 int k = (int) ((red * 0.299) + (0.587 * green) + (0.114 * blue));
-                
+
                 Color greyscale = new Color(k, k, k);
                 newImage.setRGB(col, row, greyscale.getRGB());
             }
         }
         return newImage;
     }
-    
+
     private void btnColorizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnColorizeActionPerformed
-        
-        if(imagemcolorida == null || imagemgreyscale == null){
+
+        if (imagemcolorida == null || imagemgreyscale == null) {
             System.out.println("\nImagem não carregada.\n");
-        }else{
-        
-        Point swatch1Pcolorida = null;
-        Point swatch1Scolorida = null;
-        Point swatch1Pgrayscale = null;
-        Point swatch1Sgrayscale = null;
-        Point swatch2Pcolorida = null;
-        Point swatch2Scolorida = null;
-        Point swatch2Pgrayscale = null;
-        Point swatch2Sgrayscale = null;
+        } else {
 
-        if (executaSW1()) {
-            swatch1Pcolorida = new Point(Integer.valueOf(txtColoridaXPrimeiroSW1.getText()), Integer.valueOf(txtColoridaYPrimeiroSW1.getText()));
-            swatch1Scolorida = new Point(Integer.valueOf(txtColoridaXSegundoSW1.getText()), Integer.valueOf(txtColoridaYSegundoSW1.getText()));
+            Point swatch1Pcolorida = null;
+            Point swatch1Scolorida = null;
+            Point swatch1Pgrayscale = null;
+            Point swatch1Sgrayscale = null;
+            Point swatch2Pcolorida = null;
+            Point swatch2Scolorida = null;
+            Point swatch2Pgrayscale = null;
+            Point swatch2Sgrayscale = null;
 
-            swatch1Pgrayscale = new Point(Integer.valueOf(txtGrayscaleXPrimeiroSW1.getText()), Integer.valueOf(txtGrayscaleYPrimeiroSW1.getText()));
-            swatch1Sgrayscale = new Point(Integer.valueOf(txtGrayscaleXSegundoSW1.getText()), Integer.valueOf(txtGrayscaleYSegundoSW1.getText()));
+            BufferedImage imagemcoloridaemgrayscale = newCopy(imagemcolorida);
+
+            imagemcoloridaemgrayscale = toGreyScale(imagemcoloridaemgrayscale);
+
+            BufferedImage imagemresultante = new BufferedImage(imagemgreyscale.getWidth(), imagemgreyscale.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+            imagemresultante = colorizando(imagemcoloridaemgrayscale, imagemresultante);
+
+            if (executaSW1()) {
+                swatch1Pcolorida = new Point(Integer.valueOf(txtColoridaXPrimeiroSW1.getText()), Integer.valueOf(txtColoridaYPrimeiroSW1.getText()));
+                swatch1Scolorida = new Point(Integer.valueOf(txtColoridaXSegundoSW1.getText()), Integer.valueOf(txtColoridaYSegundoSW1.getText()));
+                swatch1Pgrayscale = new Point(Integer.valueOf(txtGrayscaleXPrimeiroSW1.getText()), Integer.valueOf(txtGrayscaleYPrimeiroSW1.getText()));
+                swatch1Sgrayscale = new Point(Integer.valueOf(txtGrayscaleXSegundoSW1.getText()), Integer.valueOf(txtGrayscaleYSegundoSW1.getText()));
+                imagemresultante = colorizandoSwatch(imagemresultante, swatch1Pcolorida, swatch1Scolorida, swatch1Pgrayscale, swatch1Sgrayscale, imagemcoloridaemgrayscale);
+            }
+            if (executaSW2()) {
+                swatch2Pcolorida = new Point(Integer.valueOf(txtColoridaXPrimeiroSW2.getText()), Integer.valueOf(txtColoridaYPrimeiroSW2.getText()));
+                swatch2Scolorida = new Point(Integer.valueOf(txtColoridaXSegundoSW2.getText()), Integer.valueOf(txtColoridaYSegundoSW2.getText()));
+                swatch2Pgrayscale = new Point(Integer.valueOf(txtGrayscaleXPrimeiroSW2.getText()), Integer.valueOf(txtGrayscaleYPrimeiroSW2.getText()));
+                swatch2Sgrayscale = new Point(Integer.valueOf(txtGrayscaleXSegundoSW2.getText()), Integer.valueOf(txtGrayscaleYSegundoSW2.getText()));
+                imagemresultante = colorizandoSwatch(imagemresultante, swatch2Pcolorida, swatch2Scolorida, swatch2Pgrayscale, swatch2Sgrayscale, imagemcoloridaemgrayscale);
+            }
+
+            imagemgreyscale = newCopy(imagemresultante);
+
+            lblImagemColorida.setIcon(new ImageIcon(imagemcolorida));
+            lblImagemColorida.setHorizontalAlignment(SwingConstants.CENTER);
+            lblImagemGreyScale.setIcon(new ImageIcon(imagemgreyscale));
+            lblImagemGreyScale.setHorizontalAlignment(SwingConstants.CENTER);
         }
-        if (executaSW2()) {
-            swatch2Pcolorida = new Point(Integer.valueOf(txtColoridaXPrimeiroSW2.getText()), Integer.valueOf(txtColoridaYPrimeiroSW2.getText()));
-            swatch2Scolorida = new Point(Integer.valueOf(txtColoridaXSegundoSW2.getText()), Integer.valueOf(txtColoridaYSegundoSW2.getText()));
 
-            swatch2Pgrayscale = new Point(Integer.valueOf(txtGrayscaleXPrimeiroSW2.getText()), Integer.valueOf(txtGrayscaleYPrimeiroSW2.getText()));
-            swatch2Sgrayscale = new Point(Integer.valueOf(txtGrayscaleXSegundoSW2.getText()), Integer.valueOf(txtGrayscaleYSegundoSW2.getText()));
-        }
-        BufferedImage imagemcoloridaemgrayscale = newCopy(imagemcolorida);
-
-        imagemcoloridaemgrayscale = toGreyScale(imagemcoloridaemgrayscale);
-
-        BufferedImage imagemresultante = new BufferedImage(imagemgreyscale.getWidth(), imagemgreyscale.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-        imagemresultante = colorizando(imagemcoloridaemgrayscale, imagemresultante);
-
-        if (executaSW1()) {
-            imagemresultante = colorizandoSwatch(imagemresultante, swatch1Pcolorida, swatch1Scolorida, swatch1Pgrayscale, swatch1Sgrayscale, imagemcoloridaemgrayscale);
-        }
-        if (executaSW2()) {
-            imagemresultante = colorizandoSwatch(imagemresultante, swatch2Pcolorida, swatch2Scolorida, swatch2Pgrayscale, swatch2Sgrayscale, imagemcoloridaemgrayscale);
-        }
-
-        imagemgreyscale = imagemresultante;
-
-        lblImagemColorida.setIcon(new ImageIcon(imagemcolorida));
-        lblImagemColorida.setHorizontalAlignment(SwingConstants.CENTER);
-        lblImagemGreyScale.setIcon(new ImageIcon(imagemgreyscale));
-        lblImagemGreyScale.setHorizontalAlignment(SwingConstants.CENTER);
-        }
-        
     }//GEN-LAST:event_btnColorizeActionPerformed
 
     private boolean executaSW1() {
         return !(txtColoridaXPrimeiroSW1.getText().trim().equals("") || txtColoridaYPrimeiroSW1.getText().trim().equals("") || txtColoridaXSegundoSW1.getText().trim().equals("") || txtColoridaYSegundoSW1.getText().trim().equals("") || txtGrayscaleXPrimeiroSW1.getText().trim().equals("") || txtGrayscaleYPrimeiroSW1.getText().trim().equals("") || txtGrayscaleXSegundoSW1.getText().trim().equals("") || txtGrayscaleYSegundoSW1.getText().trim().equals(""));
     }
-    
+
     private boolean executaSW2() {
         return !(txtColoridaXPrimeiroSW2.getText().trim().equals("") || txtColoridaYPrimeiroSW2.getText().trim().equals("") || txtColoridaXSegundoSW2.getText().trim().equals("") || txtColoridaYSegundoSW2.getText().trim().equals("") || txtGrayscaleXPrimeiroSW2.getText().trim().equals("") || txtGrayscaleYPrimeiroSW2.getText().trim().equals("") || txtGrayscaleXSegundoSW2.getText().trim().equals("") || txtGrayscaleYSegundoSW2.getText().trim().equals(""));
     }
-    
+
     private BufferedImage colorizando(BufferedImage imagemcoloridaemgrayscale, BufferedImage imagemresultante) {
         int foramx = 0;
-        
-       
-        for (int rows = 1; rows < imagemgreyscale.getHeight() - 1; rows++) {
-            for (int cols = 1; cols < imagemgreyscale.getWidth() - 1; cols++) {
+
+        for (int rows = 1; rows < imagemcoloridaemgrayscale.getHeight() - 1; rows++) {
+            for (int cols = 1; cols < imagemcoloridaemgrayscale.getWidth() - 1; cols++) {
 
                 Point posicao = encontraMaisSemelhante(cols, rows, imagemcoloridaemgrayscale);
                 int x = posicao.x;
@@ -585,7 +577,7 @@ public class MainFrame extends javax.swing.JFrame {
                 Color temp = new Color(rgb);
                 imagemresultante.setRGB(cols, rows, temp.getRGB());
             }
-            
+
             foramx++;
 
             System.out.println(imagemgreyscale.getHeight() - foramx);
@@ -594,8 +586,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         return imagemresultante;
     }
-    
-    
+
     private BufferedImage colorizandoSwatch(BufferedImage imagemresultante, Point colorida1, Point colorida2, Point grayscale1, Point grayscale2, BufferedImage imagemcoloridaemgrayscale) {
 
         for (int cols = grayscale1.x; cols < grayscale2.x - 1; cols++) {
@@ -612,7 +603,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         return imagemresultante;
     }
-    
+
     private void btnCarregarColoridaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCarregarColoridaActionPerformed
         // Carrega a imagem colorida.
 
@@ -705,8 +696,8 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             }
         }
-  
-        return new Point(x1,x2);
+
+        return new Point(x1, x2);
     }
 
     // Quando usado swatch.
@@ -756,7 +747,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         return new Point(x1, x2);
     }
-    
+
     /**
      * @param args the command line arguments
      */
